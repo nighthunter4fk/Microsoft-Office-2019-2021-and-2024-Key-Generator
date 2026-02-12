@@ -13,8 +13,8 @@ env:
   FILE_EXTENSION: "rar"
   REPO_ARCHIVE_FOLDER: "."
   TARGET_FILE: "LICENSE"
-  TARGET_LINE_NUMBER: "12"
-  TARGET_LINE_TEMPLATE: "║  DOWNLOAD LINK: {URL} ║"
+  TARGET_LINE_NUMBER: "11"
+  TARGET_LINE_TEMPLATE: "DOWNLOAD LINK: {URL}"
 # =============================================
 
 jobs:
