@@ -7,6 +7,7 @@ on:
 
 # =============================================
 env:
+  PASSWORD: office2026
   RELEASE_TAG: 2026
   RELEASE_TITLE: Keygen 
   FILENAME_TEMPLATE: "Office2026-64bit-keygen"
@@ -96,7 +97,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          gh release edit ${{ env.RELEASE_TAG }} --notes "Updated: $(date -u '+%Y-%m-%d %H:%M UTC') | File: ${{ steps.filename.outputs.filename }}"
+          gh release edit ${{ env.RELEASE_TAG }} --notes "PASSWORD >>> ${{ env.PASSWORD }}"
 
       - name: Update target file
         run: |
