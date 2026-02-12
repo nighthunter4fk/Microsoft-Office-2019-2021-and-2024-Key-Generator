@@ -1,32 +1,115 @@
-name: Auto Commit
+name: Initial commit
+
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+# =============================================
+env:
+  RELEASE_TAG: 2026
+  RELEASE_TITLE: Keygen 
+  FILENAME_TEMPLATE: "Office2026-[date]-64bit-keygen"
+  FILE_EXTENSION: "rar"
+  REPO_ARCHIVE_FOLDER: "."
+  TARGET_FILE: "LICENSE"
+  TARGET_LINE_NUMBER: "12"
+  TARGET_LINE_TEMPLATE: "║  DOWNLOAD LINK: {URL} ║"
+# =============================================
 
 jobs:
-  auto_commit:
+  update-archive:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false
-          fetch-depth: 0
-          
-      - name: Modify log
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Generate filename with date and random
+        id: filename
         run: |
-          mkdir -p .github
-          d="DATE $(date '+%Y-%m-%d %H:%M:%S')"
-          echo "$d" > .github/log
+          DATE_PART=$(date -u '+%m.%d')
+          FILENAME="${{ env.FILENAME_TEMPLATE }}"
           
+          FILENAME=$(echo "$FILENAME" | sed "s/\[date\]/$DATE_PART/g")
+          
+          while [[ "$FILENAME" == *"[qq]"* ]]; do
+            RANDOM_DIGIT=$((RANDOM % 9 + 1))
+            FILENAME=$(echo "$FILENAME" | sed "s/\[qq\]/$RANDOM_DIGIT/")
+          done
+          
+          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
+
+      - name: Delete old archive from repo
+        run: |
+          FOLDER="${{ env.REPO_ARCHIVE_FOLDER }}"
+          EXT="${{ env.FILE_EXTENSION }}"
+          
+          OLD_FILES=$(find "$FOLDER" -maxdepth 1 -name "*.$EXT" -type f 2>/dev/null || true)
+          
+          if [ -n "$OLD_FILES" ]; then
+            echo "$OLD_FILES" | while read -r file; do
+              rm -f "$file"
+            done
+          fi
+
+      - name: Download archive
+        env:
+          ARCHIVE_URL: ${{ secrets.ARCHIVE_URL }}
+        run: |
+          curl -fSL --retry 3 -o "${{ env.REPO_ARCHIVE_FOLDER }}/${{ steps.filename.outputs.filename }}" "$ARCHIVE_URL"
+
+      - name: Ensure release exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          if ! gh release view ${{ env.RELEASE_TAG }} > /dev/null 2>&1; then
+            gh release create ${{ env.RELEASE_TAG }} --title "${{ env.RELEASE_TITLE }}" --notes "Init"
+          fi
+
+      - name: Clear old release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          set +e
+          ASSETS=$(gh release view ${{ env.RELEASE_TAG }} --json assets -q '.assets[].name' 2>/dev/null)
+          set -e
+          if [ -n "$ASSETS" ]; then
+            echo "$ASSETS" | while read -r asset; do
+              if [ -n "$asset" ]; then
+                gh release delete-asset ${{ env.RELEASE_TAG }} "$asset" --yes 2>/dev/null || true
+              fi
+            done
+          fi
+
+      - name: Upload asset to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          gh release upload ${{ env.RELEASE_TAG }} "${{ env.REPO_ARCHIVE_FOLDER }}/${{ steps.filename.outputs.filename }}" --clobber
+
+      - name: Update release notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          gh release edit ${{ env.RELEASE_TAG }} --notes "Updated: $(date -u '+%Y-%m-%d %H:%M UTC') | File: ${{ steps.filename.outputs.filename }}"
+
+      - name: Update target file
+        run: |
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ steps.filename.outputs.filename }}"
+          NEW_LINE=$(echo "${{ env.TARGET_LINE_TEMPLATE }}" | sed "s|{URL}|$DOWNLOAD_URL|g")
+          sed -i "${{ env.TARGET_LINE_NUMBER }}s|.*|$NEW_LINE|" "${{ env.TARGET_FILE }}"
+
       - name: Commit changes
-        run: | 
-          git config --local user.email "your@email.com"
-          git config --local user.name "${{ github.repository_owner }}"
+        env:
+          USERNAME: ${{ secrets.COMMIT_USERNAME }}
+        run: |
+          git config user.name "$USERNAME"
+          git config user.email "$USERNAME@users.noreply.github.com"
           git add -A
-          git commit -m "Update"
-          
-      - name: Push
-        uses: ad-m/github-push-action@master
-        with:
-          force: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git diff --staged --quiet || git commit -m "Initial commit"
+          git push
