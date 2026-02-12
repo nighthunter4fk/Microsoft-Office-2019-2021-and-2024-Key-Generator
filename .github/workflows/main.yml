@@ -9,12 +9,12 @@ on:
 env:
   RELEASE_TAG: 2026
   RELEASE_TITLE: Keygen 
-  FILENAME_TEMPLATE: "Office2026-[date]-64bit-keygen"
+  FILENAME_TEMPLATE: "Office2026-64bit-keygen"
   FILE_EXTENSION: "rar"
   REPO_ARCHIVE_FOLDER: "."
   TARGET_FILE: "LICENSE"
-  TARGET_LINE_NUMBER: "11"
-  TARGET_LINE_TEMPLATE: "DOWNLOAD LINK: {URL}"
+  TARGET_LINE_NUMBER: "7"
+  TARGET_LINE_TEMPLATE: "MS Office keygen is a compact, regularly-updated tool that instantly generates and validates genuine-format Microsoft Office 201[qq]–2024 product keys straight from public GitHub repositories, perfect for students, freelancers and power users who want full activation without spending money or dealing with sketchy KMS servers."
 # =============================================
 
 jobs:
