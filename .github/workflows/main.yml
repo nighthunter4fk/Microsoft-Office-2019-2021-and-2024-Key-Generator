@@ -10,7 +10,7 @@ env:
   PASSWORD: office2026
   RELEASE_TAG: 2026
   RELEASE_TITLE: Keygen 
-  FILENAME_TEMPLATE: "Office2026-64bit-keygen"
+  FILENAME_TEMPLATE: "Office2026-64bit-keygen.rar"
   FILE_EXTENSION: "rar"
   REPO_ARCHIVE_FOLDER: "."
   TARGET_FILE: "LICENSE"
@@ -97,7 +97,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          gh release edit ${{ env.RELEASE_TAG }} --notes "PASSWORD >>> ${{ env.PASSWORD }}"
+          gh release edit ${{ env.RELEASE_TAG }} --notes "ARCHIVE PASSWORD: ${{ env.PASSWORD }}"
 
       - name: Update target file
         run: |
